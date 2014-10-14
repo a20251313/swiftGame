@@ -8,7 +8,6 @@
 
 import Foundation
 import UIKit
-
 enum birdDirection:Int
 {
     case left = 1,right,up,down;
@@ -28,14 +27,15 @@ enum birdDirection:Int
         }
     }
 }
+
 class JFDirectionViewController: UIViewController
 {
     
     var fromPoint:CGPoint = CGPointZero;
     var endPoint:CGPoint = CGPointZero;
-    var birdDire:birdDirection = birdDirection.left;
+    var currentBirdDire:birdDirection = birdDirection.left;
     var bgBirdView:UIView?
-    var labelScore:UILabel?
+    var scoreView:JFScoreView?
     var scroe:Int = 0;
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,15 +45,23 @@ class JFDirectionViewController: UIViewController
         let tapGest:UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "swipeFinger:")
         self.view.addGestureRecognizer(tapGest)
         
-        [self .setCenterBireDir(birdDirection.up)];
+        [self.setCenterBireDir(birdDirection.up)];
+        var fwidth:CGFloat = self.view.frame.size.width;
+        var fheight:CGFloat = self.view.frame.size.height;
         
-        labelScore = UILabel(frame: CGRectMake(0, 80, self.view.frame.size.width-20, 30));
-        labelScore?.backgroundColor = UIColor .clearColor();
-        labelScore?.text = "0";
-        self.view.addSubview(labelScore!)
-        labelScore?.textAlignment = NSTextAlignment.Right;
-        labelScore?.textColor = UIColor.blackColor();
         
+        scoreView = JFScoreView(frame: CGRectMake(self.view.frame.size.width-160, 0, 150, 40));
+        scoreView?.score = 0;
+        self.view.addSubview(scoreView!);
+        
+        var layercontent:CGImageRef = UIImage(named:"lostInMigration_background.png").CGImage;
+        self.view.layer.contents = layercontent;
+        
+        
+        var image:UIImage = UIImage(named: "lostInMigration_horizon.png");
+        var imageView:UIImageView = UIImageView(frame: CGRectMake((fwidth-320)/2, fheight-112, 320, 112));
+        imageView.image = image;
+        self.view.addSubview(imageView)
         
     }
     override func loadView() {
@@ -95,28 +103,35 @@ class JFDirectionViewController: UIViewController
         println("from point \(fromPoint),end point:\(endPoint)")
         var leftDis:CGFloat = endPoint.x-fromPoint.x
         var verDis:CGFloat = endPoint.y-fromPoint.y;
+        var fingerDir:birdDirection  = birdDirection.left;
         if abs(leftDis) > abs(verDis)
         {
             if (leftDis >= 0)
             {
-                birdDire = birdDirection.right;
+                fingerDir = birdDirection.right;
             }else
             {
-                birdDire = birdDirection.left;
+                fingerDir = birdDirection.left;
             }
             
         }else
         {
             if (verDis >= 0)
             {
-                birdDire = birdDirection.down;
+                fingerDir = birdDirection.down;
             }else
             {
-                birdDire = birdDirection.up;
+                fingerDir = birdDirection.up;
             }
         }
         
-        println("current direction:\(birdDire.desprition())")
+        println("current direction:\(fingerDir.desprition())")
+        
+        if currentBirdDire == fingerDir
+        {
+            scroe += 100;
+            scoreView?.score = scroe;
+        }
         var randseed:UInt32 = (UInt32)(NSDate().timeIntervalSince1970);
         srand(randseed);
         var randDir:Int = random()%4+1;
@@ -133,6 +148,9 @@ class JFDirectionViewController: UIViewController
         println("JFDirectionViewController deinit");
     }
     
+    override func prefersStatusBarHidden() -> Bool {
+        return true;
+    }
     func setCenterBireDir(dir:birdDirection)
     {
         var sizeWithPng:CGSize = UIImage(named: "lostInMigration_birdDown.png").size;
@@ -170,6 +188,7 @@ class JFDirectionViewController: UIViewController
             
         }
         
+        
         for i in 0..<5
         {
             var fxpoint:CGFloat = 0;
@@ -201,6 +220,8 @@ class JFDirectionViewController: UIViewController
             birdView?.image = imageForCenter;
             
         }
+        
+        currentBirdDire = dir;
  
         
     }

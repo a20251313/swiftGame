@@ -22,8 +22,6 @@ class ViewController: UIViewController {
         btnStart.center = self.view.center;
         btnStart.addTarget(self, action:"buttonClicked:", forControlEvents: UIControlEvents.TouchUpInside);
         self.view.addSubview(btnStart);
-        
-        
         self.view.backgroundColor = UIColor.whiteColor();
         // Do any additional setup after loading the view, typically from a nib.
     }
@@ -31,6 +29,12 @@ class ViewController: UIViewController {
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        self.navigationController?.setNavigationBarHidden(false, animated: true)
+        
     }
     
     func buttonClicked(sender:UIButton?)

@@ -11,7 +11,7 @@ import UIKit
 
 class JFScoreView: UIView {
     
-    var scoreLabel:UILabel?;
+    var scoreLabel:UILabel?
     var score:Int = 0{
         willSet(newScore)
         {

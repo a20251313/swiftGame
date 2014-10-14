@@ -28,7 +28,7 @@ enum birdDirection:Int
     }
 }
 
-class JFDirectionViewController: UIViewController
+class JFDirectionViewController: UIViewController,JFCountDownViewDelegate
 {
     
     var fromPoint:CGPoint = CGPointZero;
@@ -37,19 +37,54 @@ class JFDirectionViewController: UIViewController
     var bgBirdView:UIView?
     var scoreView:JFScoreView?
     var scroe:Int = 0;
+    var buttonBack:UIButton?
+    
+    var mainSeconds:Int = 0;
+    var mainTimer:NSTimer?
+    var singleSeconds:Int = 0;
+    var singleTimer:NSTimer?
+ 
+    
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        
+        
         self.navigationController?.setNavigationBarHidden(true, animated: true);
         UIApplication.sharedApplication().setStatusBarHidden(true, withAnimation: UIStatusBarAnimation.Fade);
         self.view.backgroundColor = UIColor.lightGrayColor();
         let tapGest:UIPanGestureRecognizer = UIPanGestureRecognizer(target: self, action: "swipeFinger:")
         self.view.addGestureRecognizer(tapGest)
         
-        [self.setCenterBireDir(birdDirection.up)];
+      
         var fwidth:CGFloat = self.view.frame.size.width;
         var fheight:CGFloat = self.view.frame.size.height;
+        for i in 1...6
+        {
+            let name:String = "lostInMigration_cloud"+"\(i)"+".png"
+            let image:UIImage = UIImage(named:name);
+            var xpoint:CGFloat = 0;
+            var ypoint:CGFloat = (CGFloat)(30.0+i*40.0);
+            if i%2 == 0
+            {
+                xpoint = (fwidth/2-image.size.width/2)/2;
+            }else
+            {
+                xpoint = fwidth/2+(fwidth/2-image.size.width/2)/2;
+            }
+            
+            var cloudView:UIImageView = UIImageView(frame: CGRectMake(xpoint, ypoint, image.size.width/2, image.size.height/2));
+            cloudView.image = image;
+            cloudView.alpha = 0.5;
+            self.view.addSubview(cloudView);
+            
+        }
         
         
+        
+        [self.setCenterBireDir(birdDirection.up)];
         scoreView = JFScoreView(frame: CGRectMake(self.view.frame.size.width-160, 0, 150, 40));
         scoreView?.score = 0;
         self.view.addSubview(scoreView!);
@@ -63,18 +98,90 @@ class JFDirectionViewController: UIViewController
         imageView.image = image;
         self.view.addSubview(imageView)
         
+        buttonBack = UIButton(frame: CGRectMake(10, 10, 30, 30));
+        buttonBack?.setImage(UIImage(named: "game_iconMainMenuUp.png"), forState: UIControlState.Normal);
+        buttonBack?.addTarget(self, action: "clickBack:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.view.addSubview(buttonBack!);
+        
     }
     override func loadView() {
      super.loadView()
     }
     
-    
+    func clickBack(sender:UIButton!)
+    {
+        self.navigationController?.popViewControllerAnimated(true);
+    }
 
     func testLocal(extername localname:String)
     {
         println(localname);
     }
     
+    override func viewDidAppear(animated: Bool) {
+        super.viewDidAppear(animated)
+        var countDownView:JFCountDownView = JFCountDownView(frame: CGRectMake(0, 0, 100, 100));
+        countDownView.center = self.view.center;
+        self.view.addSubview(countDownView);
+        countDownView.delegate = self;
+        countDownView.startCountDown(3);
+    }
+    
+    func startSingleTime()
+    {
+        self.stopSingleTimer()
+        singleSeconds = 0;
+        singleTimer = NSTimer(fireDate: NSDate(), interval: 1, target: self, selector: "singleTime:", userInfo: nil, repeats: true);
+        singleTimer?.fire();
+        
+        
+    }
+    func singleTime(timers:NSTimer!)
+    {
+        singleSeconds++;
+        
+    }
+    func stopSingleTimer()
+    {
+        if singleTimer != nil
+        {
+            if (singleTimer?.valid != nil)
+            {
+                singleTimer?.invalidate();
+            }
+        }
+        singleTimer = nil;
+    }
+    
+    
+    func mainTimer(timers:NSTimer!)
+    {
+        mainSeconds++;
+    }
+    func stopMainTimer()
+    {
+        if mainTimer != nil
+        {
+            if (mainTimer?.valid != nil)
+            {
+                mainTimer?.invalidate();
+            }
+            
+        }
+        mainTimer = nil;
+    }
+    
+    func startMainTime()
+    {
+       
+        self.stopMainTimer()
+        mainSeconds = 0;
+      
+        mainTimer = NSTimer(fireDate: NSDate(), interval: 1, target: self, selector: "mainTimer:", userInfo: nil, repeats: true);
+        mainTimer?.fire();
+        
+        
+    }
     func swipeFinger(gest:UIPanGestureRecognizer?)
     {
         var infoPoint:CGPoint = gest!.locationInView(self.view);
@@ -222,7 +329,11 @@ class JFDirectionViewController: UIViewController
         }
         
         currentBirdDire = dir;
- 
         
     }
+    
+     func countDownFinished(countView:JFCountDownView!)
+     {
+        countView.removeFromSuperview();
+     }
 }

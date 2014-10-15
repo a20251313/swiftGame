@@ -38,6 +38,7 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
     var scoreView:JFScoreView?
     var scroe:Int = 0;
     var buttonBack:UIButton?
+    let gameTime:Int = 60;
     
     //var mainSeconds:Int = 0;
     //var mainTimer:NSTimer?
@@ -102,6 +103,7 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
         
         self.addFunHome();
         mainTimerView = JFCountNumberView(frame: CGRectMake(self.view.frame.size.width-160-102, 0, 100, 40));
+        mainTimerView?.delegate = self;
         self.view.addSubview(mainTimerView!);
         
         
@@ -376,13 +378,13 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
         {
             countView.removeFromSuperview();
             self.addFuncPause()
-            mainTimerView?.startMainTime(180);
+            mainTimerView?.startMainTime(gameTime);
             self.startSingleTime(0);
             NSNotificationCenter.defaultCenter().addObserver(self, selector: "receiveEnterBgGround:", name:UIApplicationDidEnterBackgroundNotification, object: nil);
             
         }else if countView is JFCountNumberView
         {
-            self.clickPause(nil);
+            self.clickPause(buttonBack);
         }
         
      }

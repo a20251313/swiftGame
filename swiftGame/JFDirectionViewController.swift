@@ -28,24 +28,26 @@ enum birdDirection:Int
     }
 }
 
-class JFDirectionViewController: UIViewController,JFCountDownViewDelegate
+class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenuViewControllerDelegate
 {
     
     var fromPoint:CGPoint = CGPointZero;
     var endPoint:CGPoint = CGPointZero;
-    var currentBirdDire:birdDirection = birdDirection.left;
+    var currentBirdDire:birdDirection = birdDirection.up;
     var bgBirdView:UIView?
     var scoreView:JFScoreView?
     var scroe:Int = 0;
     var buttonBack:UIButton?
     
-    var mainSeconds:Int = 0;
-    var mainTimer:NSTimer?
+    //var mainSeconds:Int = 0;
+    //var mainTimer:NSTimer?
     var singleSeconds:Int = 0;
     var singleTimer:NSTimer?
- 
+    var mainTimerView:JFCountNumberView?
+    var isFirstEnter:Bool = true
     
-    
+    var puaseSeconds:Int = 0;
+    var puaseSingSeconds:Int = 0;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -98,11 +100,37 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate
         imageView.image = image;
         self.view.addSubview(imageView)
         
+        self.addFunHome();
+        mainTimerView = JFCountNumberView(frame: CGRectMake(self.view.frame.size.width-160-102, 0, 100, 40));
+        self.view.addSubview(mainTimerView!);
+        
+        
+       
+        
+    }
+    
+    deinit
+    {
+        NSNotificationCenter.defaultCenter().removeObserver(self);
+    }
+    func addFunHome()
+    {
+        buttonBack?.removeFromSuperview();
+        buttonBack = nil;
         buttonBack = UIButton(frame: CGRectMake(10, 10, 30, 30));
         buttonBack?.setImage(UIImage(named: "game_iconMainMenuUp.png"), forState: UIControlState.Normal);
         buttonBack?.addTarget(self, action: "clickBack:", forControlEvents: UIControlEvents.TouchUpInside)
         self.view.addSubview(buttonBack!);
-        
+    }
+    
+    func addFuncPause()
+    {
+        buttonBack?.removeFromSuperview();
+        buttonBack = nil;
+        buttonBack = UIButton(frame: CGRectMake(10, 10, 30, 30));
+        buttonBack?.setImage(UIImage(named: "game_buttonPauseUp.png"), forState: UIControlState.Normal);
+        buttonBack?.addTarget(self, action: "clickPause:", forControlEvents: UIControlEvents.TouchUpInside)
+        self.view.addSubview(buttonBack!);
     }
     override func loadView() {
      super.loadView()
@@ -112,6 +140,18 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate
     {
         self.navigationController?.popViewControllerAnimated(true);
     }
+    func clickPause(sender:UIButton!)
+    {
+        
+ 
+        self.stopSingleTimer();
+        puaseSeconds = mainTimerView!.countSeconds;
+        puaseSingSeconds = singleSeconds;
+        mainTimerView?.stopcountTimer();
+        var menuControll:JFMenuViewController = JFMenuViewController();
+        menuControll.delegate = self;
+        self.navigationController?.pushViewController(menuControll, animated: true);
+    }
 
     func testLocal(extername localname:String)
     {
@@ -120,17 +160,19 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate
     
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        var countDownView:JFCountDownView = JFCountDownView(frame: CGRectMake(0, 0, 100, 100));
-        countDownView.center = self.view.center;
-        self.view.addSubview(countDownView);
-        countDownView.delegate = self;
-        countDownView.startCountDown(3);
+        
+        if (isFirstEnter)
+        {
+            self.startNewGame();
+            isFirstEnter = false;
+        }
+        
     }
     
-    func startSingleTime()
+    func startSingleTime(fromseconds:Int)
     {
         self.stopSingleTimer()
-        singleSeconds = 0;
+        singleSeconds = fromseconds;
         singleTimer = NSTimer(fireDate: NSDate(), interval: 1, target: self, selector: "singleTime:", userInfo: nil, repeats: true);
         singleTimer?.fire();
         
@@ -153,7 +195,7 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate
         singleTimer = nil;
     }
     
-    
+    /*
     func mainTimer(timers:NSTimer!)
     {
         mainSeconds++;
@@ -176,12 +218,11 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate
        
         self.stopMainTimer()
         mainSeconds = 0;
-      
         mainTimer = NSTimer(fireDate: NSDate(), interval: 1, target: self, selector: "mainTimer:", userInfo: nil, repeats: true);
         mainTimer?.fire();
         
         
-    }
+    }*/
     func swipeFinger(gest:UIPanGestureRecognizer?)
     {
         var infoPoint:CGPoint = gest!.locationInView(self.view);
@@ -245,14 +286,9 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate
      
         var dir:birdDirection = birdDirection.fromRaw(randDir)!;
            println("+++++++++++++++++++dir:\(dir.desprition())+++++++++++++\n\n\n");
-        [self .setCenterBireDir(dir)];
+        self.setCenterBireDir(dir);
         
         
-    }
-    
-    deinit
-    {
-        println("JFDirectionViewController deinit");
     }
     
     override func prefersStatusBarHidden() -> Bool {
@@ -329,11 +365,65 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate
         }
         
         currentBirdDire = dir;
+        self.startSingleTime(0);
         
     }
     
-     func countDownFinished(countView:JFCountDownView!)
+     func countDownFinished(countView:AnyObject!)
      {
-        countView.removeFromSuperview();
+       
+        if countView is JFCountDownView
+        {
+            countView.removeFromSuperview();
+            self.addFuncPause()
+            mainTimerView?.startMainTime(180);
+            self.startSingleTime(0);
+            NSNotificationCenter.defaultCenter().addObserver(self, selector: "receiveEnterBgGround:", name:UIApplicationDidEnterBackgroundNotification, object: nil);
+            
+        }else if countView is JFCountNumberView
+        {
+            self.clickPause(nil);
+        }
+        
      }
+    
+    func startNewGame()
+    {
+     
+        self.setCenterBireDir(birdDirection.up);
+        self.scroe = 0;
+        self.scoreView?.score = 0;
+        self.scoreView?.setNewValueFroScore(0);
+        
+        
+        var countDownView:JFCountDownView = JFCountDownView(frame: CGRectMake(0, 0, 100, 100));
+        countDownView.center = self.view.center;
+        self.view.addSubview(countDownView);
+        countDownView.delegate = self;
+        countDownView.startCountDown(3);
+        
+        
+    }
+    func didSelectActionOfIndex(index:Int)
+    {
+        
+        println("didSelectActionOfIndex:\(index)");
+        if (index == 0)
+        {
+            self.mainTimerView?.startMainTime(puaseSeconds);
+            self.startSingleTime(puaseSingSeconds);
+            self.navigationController?.popViewControllerAnimated(true);
+        }else if (index == 1)
+        {
+            self.navigationController?.popViewControllerAnimated(true);
+            self.startNewGame()
+        }else if(index == 2)
+        {
+            self.navigationController?.popToRootViewControllerAnimated(true);
+        }
+    }
+    func receiveEnterBgGround(note:NSNotification!)
+    {
+        self.clickPause(nil);
+    }
 }

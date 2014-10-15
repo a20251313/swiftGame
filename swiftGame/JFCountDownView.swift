@@ -11,8 +11,7 @@ import Foundation
 
 @objc protocol JFCountDownViewDelegate
 {
-    func countDownFinished(countView:JFCountDownView!);
-    
+    func countDownFinished(countView:AnyObject!);
 }
 
 //100 * 100
@@ -59,7 +58,10 @@ class JFCountDownView: UIImageView {
     }
     func mainTimer(timers:NSTimer!)
     {
-        countDownNumber--;
+        
+        self.showNumberWithSeconds(countDownNumber);
+        
+       
         println("mainTimer:\(countDownNumber)")
         if countDownNumber <= 0
         {
@@ -67,7 +69,9 @@ class JFCountDownView: UIImageView {
             delegate?.countDownFinished(self);
             return
         }
-        self.showNumberWithSeconds(countDownNumber);
+        
+        countDownNumber--;
+        
         
        
     }
@@ -91,7 +95,7 @@ class JFCountDownView: UIImageView {
         countDownNumber = seconds;
         mainTimer = NSTimer(fireDate: NSDate(), interval: 1.0, target: self, selector:"mainTimer:", userInfo: nil, repeats: true);
         NSRunLoop.currentRunLoop().addTimer(mainTimer!, forMode: NSDefaultRunLoopMode);
-        self.showNumberWithSeconds(seconds)
+
       //  mainTimer?.fire();
     }
     

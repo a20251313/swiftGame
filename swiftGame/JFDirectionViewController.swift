@@ -38,7 +38,7 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
     var scoreView:JFScoreView?
     var scroe:Int = 0;
     var buttonBack:UIButton?
-    let gameTime:Int = 60;
+    let gameTime:Int = 20;
     
     //var mainSeconds:Int = 0;
     //var mainTimer:NSTimer?
@@ -276,12 +276,26 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
         }
         
         println("current direction:\(fingerDir.desprition())")
-        
+        var imageName = "game_feedbackCorrect.png";
+        var answerView:UIImageView = UIImageView(frame: CGRectMake((self.view.frame.size.width-36)/2, (self.view.frame.size.height-36)/2-110,36,36));
         if currentBirdDire == fingerDir
         {
             scroe += 100;
-            scoreView?.score = scroe;
+            scoreView?.setNewValueFroScore(scroe);
+            
+        }else
+        {
+            imageName = "game_feedbackIncorrect.png";
+            
         }
+        answerView.image = UIImage(named:imageName);
+        self.view.addSubview(answerView);
+        var ani:CABasicAnimation = CABasicAnimation.aniWithScale(0.3, tovalue: 2, fromValue: 0.25);
+        ani.delegate = self;
+        ani.setValue(answerView, forKey: "view");
+        answerView.layer.addAnimation(ani, forKey:"");
+        
+        
         var randseed:UInt32 = (UInt32)(NSDate().timeIntervalSince1970);
         srand(randseed);
         var randDir:Int = random()%4+1;
@@ -289,6 +303,7 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
         var dir:birdDirection = birdDirection.fromRaw(randDir)!;
            println("+++++++++++++++++++dir:\(dir.desprition())+++++++++++++\n\n\n");
         self.setCenterBireDir(dir);
+        self.startSingleTime(0);
         
         
     }
@@ -384,7 +399,11 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
             
         }else if countView is JFCountNumberView
         {
-            self.clickPause(buttonBack);
+            var winView = JFWinScoreView(frame: CGRectMake((self.view.frame.size.width-260)/2, (self.view.frame.size.height-80)/2, 260, 80), points: 0);
+            self.view.addSubview(winView);
+            winView.showPoints(scroe);
+            self.addFunHome()
+            
         }
         
      }
@@ -427,5 +446,17 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
     func receiveEnterBgGround(note:NSNotification!)
     {
         self.clickPause(nil);
+    }
+    
+    
+    override func animationDidStart(anim: CAAnimation!)
+    {
+        
+    }
+    
+    override func animationDidStop(anim: CAAnimation!, finished flag: Bool)
+    {
+        var view:UIView = anim.valueForKey("view") as UIView;
+        view.removeFromSuperview();
     }
 }

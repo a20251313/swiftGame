@@ -21,13 +21,11 @@ class JFCountNumberView: UIView {
     {
         if labelCount == nil
         {
-            
             labelCount = UILabel(frame: CGRectMake(self.frame.size.width/2,0, self.frame.size.width/2, self.frame.size.height))
             labelCount?.backgroundColor = UIColor.clearColor();
             labelCount?.textAlignment = NSTextAlignment.Center;
             labelCount?.textColor = UIColor.purpleColor();
             self.addSubview(labelCount!);
-            
             var labelTime:UILabel = UILabel(frame: CGRectMake(0, 0, self.frame.size.width/2, self.frame.size.height))
             labelTime.backgroundColor = UIColor.clearColor();
             labelTime.text = "TIME";
@@ -36,8 +34,9 @@ class JFCountNumberView: UIView {
         
         self.backgroundColor = UIColor(red: 102/255, green: 194/255.0, blue: 206/255.0, alpha: 1);
         
-        labelCount?.text = "\(countSeconds)"
-        
+       
+        var stringTime:String = String(format:"%02d:%02d",countSeconds/60,countSeconds%60);
+        labelCount?.text = stringTime;
 //        var ani:CABasicAnimation = CABasicAnimation.aniWithScale(1, tovalue: 0.5, fromValue: 1);
 //        self.layer.addAnimation(ani, forKey:"");
     }

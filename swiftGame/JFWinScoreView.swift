@@ -41,7 +41,7 @@ class JFWinScoreView: UIView {
         }
         labelInfo?.text = "Good jobs!You earned \(points) points";
         
-        self.backgroundColor = UIColor(rred: 31, ggreen: 15, bblue: 26, alpha: 0.7);
+        self.backgroundColor = UIColor.colorRGBA(31, green: 15, blue: 26,alpha:0.7);
         var basicAni = CABasicAnimation.aniWithScale(1, tovalue:1, fromValue: 0.25);
         basicAni.delegate = self;
         self.layer.addAnimation(basicAni, forKey: "");

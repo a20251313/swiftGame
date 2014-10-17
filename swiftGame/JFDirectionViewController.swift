@@ -152,6 +152,7 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
         mainTimerView?.stopcountTimer();
         var menuControll:JFMenuViewController = JFMenuViewController();
         menuControll.delegate = self;
+        NSNotificationCenter.defaultCenter().removeObserver(self);
         self.navigationController?.pushViewController(menuControll, animated: true);
     }
 
@@ -445,7 +446,11 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
     }
     func receiveEnterBgGround(note:NSNotification!)
     {
-        self.clickPause(nil);
+        if(self.navigationController?.viewControllers.last as UIViewController == self)
+        {
+              self.clickPause(nil);
+        }
+     
     }
     
     

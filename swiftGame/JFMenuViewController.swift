@@ -34,7 +34,7 @@ class JFMenuViewController: UIViewController,UITableViewDelegate,UITableViewData
         m_tableView?.backgroundView = UIView();
         m_tableView?.scrollEnabled = false;
         self.view.backgroundColor = UIColor.whiteColor();
-        self.view.layer.contents = UIImage(named: "speedPack_background.png").CGImage;
+        self.view.layer.contents = UIImage(named: "speedPack_background.png")!.CGImage;
     }
     
     override func viewDidAppear(animated: Bool) {

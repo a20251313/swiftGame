@@ -25,7 +25,7 @@ class ViewController: UIViewController {
         self.view.backgroundColor = UIColor.whiteColor();
         
         self.navigationController?.navigationBar.tintColor = UIColor(rred: 177, ggreen: 96, bblue: 37);
-        self.view.layer.contents = UIImage(named: "speedPack_background.png").CGImage;
+        self.view.layer.contents = UIImage(named: "speedPack_background.png")!.CGImage;
         // Do any additional setup after loading the view, typically from a nib.
     }
 

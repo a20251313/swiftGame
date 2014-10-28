@@ -67,9 +67,9 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
         for i in 1...6
         {
             let name:String = "lostInMigration_cloud"+"\(i)"+".png"
-            let image:UIImage = UIImage(named:name);
+            let image:UIImage = UIImage(named:name)!;
             var xpoint:CGFloat = 0;
-            var ypoint:CGFloat = (CGFloat)(30.0+i*40.0);
+            var ypoint:CGFloat = CGFloat((30+i*40));
             if i%2 == 0
             {
                 xpoint = (fwidth/2-image.size.width/2)/2;
@@ -92,11 +92,11 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
         scoreView?.score = 0;
         self.view.addSubview(scoreView!);
         
-        var layercontent:CGImageRef = UIImage(named:"lostInMigration_background.png").CGImage;
+        var layercontent:CGImageRef = UIImage(named:"lostInMigration_background.png")!.CGImage!;
         self.view.layer.contents = layercontent;
         
         
-        var image:UIImage = UIImage(named: "lostInMigration_horizon.png");
+        var image:UIImage = UIImage(named: "lostInMigration_horizon.png")!;
         var imageView:UIImageView = UIImageView(frame: CGRectMake((fwidth-320)/2, fheight-112, 320, 112));
         imageView.image = image;
         self.view.addSubview(imageView)
@@ -301,7 +301,7 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
         srand(randseed);
         var randDir:Int = random()%4+1;
      
-        var dir:birdDirection = birdDirection.fromRaw(randDir)!;
+        var dir:birdDirection = birdDirection(rawValue: randDir)!;
            println("+++++++++++++++++++dir:\(dir.desprition())+++++++++++++\n\n\n");
         self.setCenterBireDir(dir);
         self.startSingleTime(0);
@@ -314,7 +314,7 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
     }
     func setCenterBireDir(dir:birdDirection)
     {
-        var sizeWithPng:CGSize = UIImage(named: "lostInMigration_birdDown.png").size;
+        var sizeWithPng:CGSize = UIImage(named: "lostInMigration_birdDown.png")!.size;
        // sizeWithPng = CGSizeMake(sizeWithPng.width/2, sizeWithPng.height/2);
         var fsep:CGFloat = 10;
         var fwidth:CGFloat = sizeWithPng.width*3+fsep*2;
@@ -428,7 +428,6 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
     }
     func didSelectActionOfIndex(index:Int)
     {
-        
         println("didSelectActionOfIndex:\(index)");
         if (index == 0)
         {
@@ -452,13 +451,10 @@ class JFDirectionViewController: UIViewController,JFCountDownViewDelegate,JFMenu
         }
      
     }
-    
-    
     override func animationDidStart(anim: CAAnimation!)
     {
         
     }
-    
     override func animationDidStop(anim: CAAnimation!, finished flag: Bool)
     {
         var view:UIView = anim.valueForKey("view") as UIView;
